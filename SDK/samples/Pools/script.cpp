@@ -62,7 +62,7 @@ void update()
 		{
 			Vector3 v = ENTITY::GET_ENTITY_COORDS(vehicles[i], TRUE);
 			float x, y;
-			if (GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(v.x, v.y, v.z, &x, &y))
+			if (GRAPHICS::_WORLD3D_TO_SCREEN2D(v.x, v.y, v.z, &x, &y))
 			{
 				Vector3 plv	= ENTITY::GET_ENTITY_COORDS(playerPed, TRUE);
 				float dist = GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(plv.x, plv.y, plv.z, v.x, v.y, v.z, TRUE);
@@ -70,7 +70,7 @@ void update()
 				if (dist > 15.0)
 				{
 					int health = ENTITY::GET_ENTITY_HEALTH(vehicles[i]);
-					const char* name = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model);
+					char *name = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model);
 					// print text in a box
 					char text[256];					
 					sprintf_s(text, "^\n%s\n| Height %.02f\n| Distance %.02f\n| Health %d", name, v.z, dist, health);
@@ -81,11 +81,11 @@ void update()
 					UI::SET_TEXT_CENTRE(0);
 					UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 					UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
-					UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-					UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
-					UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
+					UI::_SET_TEXT_ENTRY("STRING");
+					UI::_ADD_TEXT_COMPONENT_STRING(text);
+					UI::_DRAW_TEXT(x, y);
 					// box
-					GRAPHICS::DRAW_RECT(x + 0.027f, y + 0.043f, 0.058f, 0.056f, 75, 75, 75, 75, 0);
+					GRAPHICS::DRAW_RECT(x + 0.027f, y + 0.043f, 0.058f, 0.056f, 75, 75, 75, 75);
 				}
 			}
 		}
@@ -102,7 +102,7 @@ void update()
 		for (int i = 0; i < count; i++)
 		{
 			// if (rand() % 2 != 0) continue;
-			if (peds[i] != playerPed && PED::IS_PED_HUMAN(peds[i]) && !ENTITY::IS_ENTITY_DEAD(peds[i], 0))
+			if (peds[i] != playerPed && PED::IS_PED_HUMAN(peds[i]) && !ENTITY::IS_ENTITY_DEAD(peds[i]))
 			{
 				for (int component = 0; component < 12; component++)
 				{
@@ -137,7 +137,7 @@ void update()
 		Hash model = ENTITY::GET_ENTITY_MODEL(objects[i]);
 		Vector3 v = ENTITY::GET_ENTITY_COORDS(objects[i], TRUE);
 		float x, y;
-		if (GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(v.x, v.y, v.z, &x, &y))
+		if (GRAPHICS::_WORLD3D_TO_SCREEN2D(v.x, v.y, v.z, &x, &y))
 		{
 			// select objects only around
 			Vector3 plv = ENTITY::GET_ENTITY_COORDS(playerPed, TRUE);
@@ -171,31 +171,13 @@ void update()
 				UI::SET_TEXT_CENTRE(0);
 				UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 				UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
-				UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-				UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
-				UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
+				UI::_SET_TEXT_ENTRY("STRING");
+				UI::_ADD_TEXT_COMPONENT_STRING(text);
+				UI::_DRAW_TEXT(x, y);
 				// box
-				GRAPHICS::DRAW_RECT(x + 0.017f, y + 0.029f, 0.04f, 0.032f, 20, 20, 20, 75, 0);
+				GRAPHICS::DRAW_RECT(x + 0.017f, y + 0.029f, 0.04f, 0.032f, 20, 20, 20, 75);
 			}
 		}
-	}
-
-	// get all pickups
-	Pickup pickups[ARR_SIZE];
-	count = worldGetAllPickups(pickups, ARR_SIZE);
-
-	// move pickups around the player
-	for (int i = 0; i < count; i++)
-	{
-		Vector3 v = ENTITY::GET_ENTITY_COORDS(pickups[i], TRUE);	
-		Vector3 plv = ENTITY::GET_ENTITY_COORDS(playerPed, TRUE);
-		float dist = GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(plv.x, plv.y, plv.z, v.x, v.y, v.z, TRUE);
-		if (dist > 5.0)
-		{
-			ENTITY::SET_ENTITY_COORDS(pickups[i], plv.x, plv.y, plv.z, 0, 0, 0, FALSE);
-		}
-
-		else GRAPHICS::DRAW_MARKER(2, plv.x, plv.y, plv.z + 5.f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f, 0.0f, 0.75f, 0.75f, 0.75f, 204, 204, 1, 100, false, true, 2, false, false, false, false);
 	}
 
 	// let's add explosions to grenades in air, looks awesome !
@@ -212,7 +194,7 @@ void update()
 			if (dist > 10.0)
 			{
 				// only 1/3 of expolsions will have the sound
-				FIRE::ADD_EXPLOSION(v.x, v.y, v.z, ExplosionTypeGrenadeL, 1.0, rand() % 3 == 0, FALSE, 0.f, FALSE);
+				FIRE::ADD_EXPLOSION(v.x, v.y, v.z, ExplosionTypeGrenadeL, 1.0, rand() % 3 == 0, FALSE, 0.0);
 			}
 		}
 	}

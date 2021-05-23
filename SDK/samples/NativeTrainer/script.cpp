@@ -18,13 +18,12 @@
 
 #include <string>
 #include <ctime>
-#include <vector>
 
 #pragma warning(disable : 4244 4305) // double <-> float conversions
 
 void draw_rect(float A_0, float A_1, float A_2, float A_3, int A_4, int A_5, int A_6, int A_7)
 {
-	GRAPHICS::DRAW_RECT((A_0 + (A_2 * 0.5f)), (A_1 + (A_3 * 0.5f)), A_2, A_3, A_4, A_5, A_6, A_7, 0);
+	GRAPHICS::DRAW_RECT((A_0 + (A_2 * 0.5f)), (A_1 + (A_3 * 0.5f)), A_2, A_3, A_4, A_5, A_6, A_7);
 }
 
 void draw_menu_line(std::string caption, float lineWidth, float lineHeight, float lineTop, float lineLeft, float textLeft, bool active, bool title, bool rescaleText = true)
@@ -80,9 +79,9 @@ void draw_menu_line(std::string caption, float lineWidth, float lineHeight, floa
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 	UI::SET_TEXT_EDGE(0, 0, 0, 0, 0);
-	UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((LPSTR)caption.c_str());
-	UI::END_TEXT_COMMAND_DISPLAY_TEXT(textLeftScaled, (((lineTopScaled + 0.00278f) + lineHeightScaled) - 0.005f),0);
+	UI::_SET_TEXT_ENTRY("STRING");
+	UI::_ADD_TEXT_COMPONENT_STRING((LPSTR)caption.c_str());
+	UI::_DRAW_TEXT(textLeftScaled, (((lineTopScaled + 0.00278f) + lineHeightScaled) - 0.005f));
 
 	// text lower part
 	UI::SET_TEXT_FONT(font);
@@ -91,13 +90,13 @@ void draw_menu_line(std::string caption, float lineWidth, float lineHeight, floa
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 	UI::SET_TEXT_EDGE(0, 0, 0, 0, 0);
-	UI::_BEGIN_TEXT_COMMAND_LINE_COUNT("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((LPSTR)caption.c_str());
-	int num25 = UI::_END_TEXT_COMMAND_GET_LINE_COUNT(textLeftScaled, (((lineTopScaled + 0.00278f) + lineHeightScaled) - 0.005f));
+	UI::_SET_TEXT_GXT_ENTRY("STRING");
+	UI::_ADD_TEXT_COMPONENT_STRING((LPSTR)caption.c_str());
+	int num25 = UI::_0x9040DFB09BE75706(textLeftScaled, (((lineTopScaled + 0.00278f) + lineHeightScaled) - 0.005f));
 
 	// rect
 	draw_rect(lineLeftScaled, lineTopScaled + (0.00278f), 
-		lineWidthScaled, ((((float)(num25)* UI::_GET_TEXT_SCALE_HEIGHT(text_scale, 0)) + (lineHeightScaled * 2.0f)) + 0.005f),
+		lineWidthScaled, ((((float)(num25)* UI::_0xDB88A37483346780(text_scale, 0)) + (lineHeightScaled * 2.0f)) + 0.005f),
 		rect_col[0], rect_col[1], rect_col[2], rect_col[3]);	
 }
 
@@ -138,13 +137,13 @@ void update_status_text()
 		UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
 		if (statusTextGxtEntry)
 		{
-			UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT((char *)statusText.c_str());
+			UI::_SET_TEXT_ENTRY((char *)statusText.c_str());
 		} else
 		{
-			UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-			UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)statusText.c_str());
+			UI::_SET_TEXT_ENTRY("STRING");
+			UI::_ADD_TEXT_COMPONENT_STRING((char *)statusText.c_str());
 		}
-		UI::END_TEXT_COMMAND_DISPLAY_TEXT(0.5, 0.5, 0);
+		UI::_DRAW_TEXT(0.5, 0.5);
 	}
 }
 
@@ -172,7 +171,6 @@ bool featurePlayerSuperJump				=	false;
 
 bool featureWeaponNoReload				=	false;
 bool featureWeaponFireAmmo				=	false;
-bool featureWeaponTpImpact				=	false;
 bool featureWeaponExplosiveAmmo			=	false;
 bool featureWeaponExplosiveMelee		=	false;
 bool featureWeaponVehRockets			=	false;
@@ -215,7 +213,7 @@ void check_player_model()
 	if (!ENTITY::DOES_ENTITY_EXIST(playerPed)) return;
 
 	Hash model = ENTITY::GET_ENTITY_MODEL(playerPed);
-	if (ENTITY::IS_ENTITY_DEAD(playerPed, 0) || PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE))
+	if (ENTITY::IS_ENTITY_DEAD(playerPed) || PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE))
 		if (model != GAMEPLAY::GET_HASH_KEY("player_zero") && 
 			model != GAMEPLAY::GET_HASH_KEY("player_one") &&
 			model != GAMEPLAY::GET_HASH_KEY("player_two"))
@@ -232,7 +230,7 @@ void check_player_model()
 			STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(model);
 
 			// wait until player is ressurected
-			while (ENTITY::IS_ENTITY_DEAD(PLAYER::PLAYER_PED_ID(), 0) || PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE))
+			while (ENTITY::IS_ENTITY_DEAD(PLAYER::PLAYER_PED_ID()) || PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE))
 				WAIT(0);
 
 		}
@@ -292,7 +290,7 @@ void update_features()
 		check_player_model();
 
 	// wait until player is ready, basicly to prevent using the trainer while player is dead or arrested
-	while (ENTITY::IS_ENTITY_DEAD(PLAYER::PLAYER_PED_ID(), 0) || PLAYER::IS_PLAYER_BEING_ARRESTED(PLAYER::PLAYER_ID(), TRUE))
+	while (ENTITY::IS_ENTITY_DEAD(PLAYER::PLAYER_PED_ID()) || PLAYER::IS_PLAYER_BEING_ARRESTED(PLAYER::PLAYER_ID(), TRUE))
 		WAIT(0);
 
 	// read default feature values from the game
@@ -300,7 +298,7 @@ void update_features()
 
 	// common variables
 	Player player = PLAYER::PLAYER_ID();
-	Ped playerPed = PLAYER::PLAYER_PED_ID();
+	Ped playerPed = PLAYER::PLAYER_PED_ID();	
 	BOOL bPlayerExists = ENTITY::DOES_ENTITY_EXIST(playerPed);
 
 	// player invincible
@@ -391,19 +389,6 @@ void update_features()
 		if (bPlayerExists)
 			GAMEPLAY::SET_EXPLOSIVE_MELEE_THIS_FRAME(player);
 	}
-	if (featureWeaponTpImpact)
-	{
-		if (bPlayerExists && PED::IS_PED_SHOOTING(playerPed))
-		{
-			Vector3 iCoord;
-			if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(playerPed, &iCoord))
-			{
-				ENTITY::SET_ENTITY_COORDS(playerPed, iCoord.x, iCoord.y, iCoord.z+1, 0, 0, 1, 1);
-				WAIT(0); 
-				set_status_text("X:" + std::to_string(iCoord.x) + "\tY:" + std::to_string(iCoord.y) + "\tZ:" + std::to_string(iCoord.z));
-			}
-		}
-	}
 
 	// weapon no reload
 	if (bPlayerExists && featureWeaponNoReload)
@@ -416,7 +401,7 @@ void update_features()
 				int maxAmmo;
 				if (WEAPON::GET_MAX_AMMO(playerPed, cur, &maxAmmo))
 				{
-					WEAPON::SET_PED_AMMO(playerPed, cur, maxAmmo, 0);
+					WEAPON::SET_PED_AMMO(playerPed, cur, maxAmmo);
 
 					maxAmmo = WEAPON::GET_MAX_AMMO_IN_CLIP(playerPed, cur, 1);
 					if (maxAmmo > 0)
@@ -496,50 +481,23 @@ void update_features()
 	// player's vehicle boost
 	if (featureVehSpeedBoost && bPlayerExists && PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0))
 	{
-		static int NosTimer = 0;
-		Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
-		float speed = ENTITY::GET_ENTITY_SPEED(playerVeh);
-		bool boostKey = IsKeyDown(VK_NUMPAD9) || CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleHorn);
-		bool stopKey = IsKeyDown(VK_NUMPAD3) || CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleBrake);
-		if (!VEHICLE::_HAS_VEHICLE_ROCKET_BOOST(playerVeh))
-		{
-			if (boostKey)
-			{
-				NosTimer = GAMEPLAY::GET_GAME_TIMER() + 1000;
-				if (speed < 3.0f) speed = 3.0f; speed += speed * 0.025f;
-				VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, speed);
-				AUDIO::SET_VEHICLE_BOOST_ACTIVE(playerVeh, true);
-				GRAPHICS::_START_SCREEN_EFFECT("RaceTurbo", 0, 0);
-			}
-			else
-			{
-				NosTimer = 0;
-				AUDIO::SET_VEHICLE_BOOST_ACTIVE(playerVeh, false);
-			}
+		Vehicle veh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+		DWORD model = ENTITY::GET_ENTITY_MODEL(veh);
 
-			if (GAMEPLAY::GET_GAME_TIMER() <= NosTimer)
-			{
-				AUDIO::SET_VEHICLE_BOOST_ACTIVE(playerVeh, 0);
-				GRAPHICS::_STOP_SCREEN_EFFECT("RaceTurbo");
-			}
-		}
-		else
-		{	// Voltic2 infinity rockets
-			if (boostKey)
-			{
-				VEHICLE::_SET_VEHICLE_ROCKET_BOOST_REFILL_TIME(playerVeh, 0);
-				VEHICLE::_SET_VEHICLE_ROCKET_BOOST_PERCENTAGE(playerVeh, 2.5);
-				if (!VEHICLE::_IS_VEHICLE_ROCKET_BOOST_ACTIVE(playerVeh)) VEHICLE::_SET_VEHICLE_ROCKET_BOOST_ACTIVE(playerVeh, true);
-			}
-			else VEHICLE::_SET_VEHICLE_ROCKET_BOOST_ACTIVE(playerVeh, false);
-		}
+		bool bUp = IsKeyDown(VK_NUMPAD9);
+		bool bDown = IsKeyDown(VK_NUMPAD3);
 
-		if (stopKey)
-		{
-			if (ENTITY::IS_ENTITY_IN_AIR(playerVeh) || speed > 5.0)
+		if (bUp || bDown)
+		{			
+			float speed = ENTITY::GET_ENTITY_SPEED(veh);
+			if (bUp) 
 			{
-				VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, 0.0);
-			}
+				if (speed < 3.0f) speed = 3.0f;
+				speed += speed * 0.05f;
+				VEHICLE::SET_VEHICLE_FORWARD_SPEED(veh, speed);
+			} else
+			if (ENTITY::IS_ENTITY_IN_AIR(veh) || speed > 5.0) 
+				VEHICLE::SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
 		}
 	}
 
@@ -1061,7 +1019,7 @@ void process_player_menu()
 						if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0))
 						{
 							Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
-							if (ENTITY::DOES_ENTITY_EXIST(playerVeh) && !ENTITY::IS_ENTITY_DEAD(playerVeh, 0))
+							if (ENTITY::DOES_ENTITY_EXIST(playerVeh) && !ENTITY::IS_ENTITY_DEAD(playerVeh))
 								VEHICLE::SET_VEHICLE_FIXED(playerVeh);
 						}
 						set_status_text("player fixed");
@@ -1144,7 +1102,7 @@ int activeLineIndexWeapon = 0;
 void process_weapon_menu()
 {
 	const float lineWidth = 250.0;
-	const int lineCount = 7;
+	const int lineCount = 6;
 
 	std::string caption = "WEAPON  OPTIONS";
 
@@ -1153,13 +1111,12 @@ void process_weapon_menu()
 		bool		*pState;
 		bool		*pUpdated;
 	} lines[lineCount] = {
-		{"GET ALL WEAPON",		NULL,						  NULL},
-		{"NO RELOAD",			&featureWeaponNoReload,		  NULL},
-		{"TELEPORT TO IMPACT",	&featureWeaponTpImpact,		  NULL },
-		{"FIRE AMMO",			&featureWeaponFireAmmo,		  NULL},
-		{"EXPLOSIVE AMMO",		&featureWeaponExplosiveAmmo,  NULL},
-		{"EXPLOSIVE MELEE",		&featureWeaponExplosiveMelee, NULL},
-		{"VEHICLE ROCKETS",		&featureWeaponVehRockets,	  NULL}
+		{"GET ALL WEAPON",	NULL,						  NULL},
+		{"NO RELOAD",		&featureWeaponNoReload,		  NULL},
+		{"FIRE AMMO",		&featureWeaponFireAmmo,		  NULL},
+		{"EXPLOSIVE AMMO",  &featureWeaponExplosiveAmmo,  NULL},
+		{"EXPLOSIVE MELEE", &featureWeaponExplosiveMelee, NULL},
+		{"VEHICLE ROCKETS", &featureWeaponVehRockets,	  NULL}
 	};
 
 	static LPCSTR weaponNames[] = {
@@ -1280,7 +1237,7 @@ LPCSTR vehicleModels[40][10] = {
 	{"NEMESIS", "FROGGER", "FROGGER2", "CUBAN800", "DUSTER", "STUNT", "MAMMATUS", "JET", "SHAMAL", "LUXOR"},
 	{"TITAN", "LAZER", "CARGOPLANE", "SQUALO", "MARQUIS", "DINGHY", "DINGHY2", "JETMAX", "PREDATOR", "TROPIC"},
 	{"SEASHARK", "SEASHARK2", "SUBMERSIBLE", "TRAILERS", "TRAILERS2", "TRAILERS3", "TVTRAILER", "RAKETRAILER", "TANKER", "TRAILERLOGS"},
-	{"TR2", "TR3", "TR4", "TRFLAT", "TRAILERSMALL", "VELUM", "ADDER", "VOLTIC2", "VACCA", "BIFTA"},
+	{"TR2", "TR3", "TR4", "TRFLAT", "TRAILERSMALL", "VELUM", "ADDER", "VOLTIC", "VACCA", "BIFTA"},
 	{ "SPEEDER", "PARADISE", "KALAHARI", "JESTER", "TURISMOR", "VESTRA", "ALPHA", "HUNTLEY", "THRUST", "MASSACRO" },
 	{ "MASSACRO2", "ZENTORNO", "BLADE", "GLENDALE", "PANTO", "PIGALLE", "WARRENER", "RHAPSODY", "DUBSTA3", "MONSTER" },
 	{ "SOVEREIGN", "INNOVATION", "HAKUCHOU", "FUROREGT", "MILJET", "COQUETTE2", "BTYPE", "BUFFALO3", "DOMINATOR2", "GAUNTLET2" },
@@ -1335,40 +1292,22 @@ bool process_carspawn_menu()
 				STREAMING::REQUEST_MODEL(model);				
 				while (!STREAMING::HAS_MODEL_LOADED(model)) WAIT(0);
 				Vector3 coords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 0.0, 5.0, 0.0);
-				Vehicle veh = VEHICLE::CREATE_VEHICLE(model, coords.x, coords.y, coords.z, 0.0, 1, 1, 0);
-				VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(veh, 0);
-				
-				if (ENTITY::DOES_ENTITY_EXIST(veh))
+				Vehicle veh = VEHICLE::CREATE_VEHICLE(model, coords.x, coords.y, coords.z, 0.0, 1, 1);
+				VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(veh);
+
+				if (featureVehWrapInSpawned)
 				{
-					auto networkID = NETWORK::VEH_TO_NET(veh);
-					if (NETWORK::NETWORK_DOES_NETWORK_ID_EXIST(networkID))
-					{
-						ENTITY::_SET_ENTITY_REGISTER(veh, TRUE);
-						if (NETWORK::NETWORK_GET_ENTITY_IS_NETWORKED(veh))
-						{
-							NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(networkID, TRUE);
-						}
-
-						DECORATOR::DECOR_SET_INT(veh, "MPBitset", 1 << 10);
-						VEHICLE::SET_VEHICLE_IS_STOLEN(veh, FALSE);
-						VEHICLE::_0xB2E0C0D6922D31F2(veh, TRUE);
-					}
-
-					if (featureVehWrapInSpawned)
-					{
-						ENTITY::SET_ENTITY_HEADING(veh, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()));
-						PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), veh, -1);
-					}
-
-					WAIT(0);
-					STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(model);
-					ENTITY::SET_VEHICLE_AS_NO_LONGER_NEEDED(&veh);
-
-					char statusText[32];
-					sprintf_s(statusText, "%s spawned", modelName);
-					set_status_text(statusText);
-
+					ENTITY::SET_ENTITY_HEADING(veh, ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()));
+					PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), veh, -1);
 				}
+
+				WAIT(0);
+				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(model);
+				ENTITY::SET_VEHICLE_AS_NO_LONGER_NEEDED(&veh);
+
+				char statusText[32];
+				sprintf_s(statusText, "%s spawned", modelName);
+				set_status_text(statusText);
 
 				return true;
 			}
@@ -2083,8 +2022,6 @@ void reset_globals()
 	featureWorldGarbageTrucks	=	true;
 
 	skinchanger_used			=	false;
-
-	*reinterpret_cast<__int64*>(getGlobalPtr(2606794)) = 1;//Disable Unspawn SP
 }
 
 void main()

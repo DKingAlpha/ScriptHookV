@@ -3,27 +3,27 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="script.cpp" />
-    <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="script.h" />
-    <ClInclude Include="..\..\inc\types.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\inc\enums.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\inc\natives.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="..\..\inc\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="script.h" />
+    <ClInclude Include="utils.h" />
     <ClInclude Include="..\..\inc\main.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
-      <UniqueIdentifier>{fe82bd4a-2d14-486a-8be5-8bf6b50a2414}</UniqueIdentifier>
+      <UniqueIdentifier>{5d58942b-ebbf-4d0a-9526-359e3a556796}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
