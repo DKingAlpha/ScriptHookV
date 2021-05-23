@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="ScriptHookV.cpp" />
+    <ClCompile Include="ASI Loader\ASILoader.cpp">
+      <Filter>ASI Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectX\D3d11Hook.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooking\Hooking.cpp">
+      <Filter>Hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\InputHook.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\NativeInvoker.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\Pools.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\ScriptEngine.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\ScriptManager.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\General.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Log.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\PEImage.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Versioning.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ScriptHookV.h" />
+    <ClInclude Include="ASI Loader\ASILoader.h">
+      <Filter>ASI Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectX\D3d11Hook.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooking\Hooking.h">
+      <Filter>Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputHook.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\NativeInvoker.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\Pools.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ScriptEngine.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ScriptManager.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\ScriptThread.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDK\inc\enums.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDK\inc\main.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDK\inc\natives.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDK\inc\types.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDK\inc\nativeCaller.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\General.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Log.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Pattern.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\PEImage.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Versioning.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE-ntauthority.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ASI Loader">
+      <UniqueIdentifier>{db33bde2-3781-4323-b194-970fed5e6989}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX">
+      <UniqueIdentifier>{efb30b54-c984-404a-8b73-06c02c5f2e11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooking">
+      <UniqueIdentifier>{149ae0fa-92e0-431d-b2b5-80a431fec5ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{2e19f5ae-fe00-49b5-9132-a00a1c1ba4d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting">
+      <UniqueIdentifier>{66632403-0729-4388-99bf-11ab30c233f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{c9d38ae9-fd17-4c9c-ac7c-a099b486b3f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{62dadced-f228-4190-a1b2-b3a0c787dfbe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

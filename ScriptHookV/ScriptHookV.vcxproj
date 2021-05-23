@@ -45,6 +45,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)detours\include;$(ProjectDir)StackWalker\include;$(ProjectDir)DirectX\DirectXTK\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4324</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
