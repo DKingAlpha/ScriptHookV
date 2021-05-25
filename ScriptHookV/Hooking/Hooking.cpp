@@ -72,6 +72,7 @@ bool Hooking::HookFunctions()
 	else
 	{
 		return true
+			&& NativeInvoker::InitializeNativeRegistration()
 			&& Detour_System_Wait.Hook(0x4EDE34FBADD967A6_handler, System_Wait, "System_Wait")
 			;
 	}

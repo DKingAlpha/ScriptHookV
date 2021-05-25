@@ -7,6 +7,8 @@
 using namespace Hooking;
 
 DX11Hook g_D3DHook;
+uint64_t* swapChainVT = nullptr;
+uint64_t g_copy_swapChainVT[0x40]{ };
 
 //texture declariations
 std::unordered_map<int, std::wstring> CreateTextureArray;
@@ -20,8 +22,8 @@ static Vector2 windowSize = Vector2();
 // Function hook stubs
 
 // IDXGISwapChain::Present
-DetourHook<HRESULT WINAPI(IDXGISwapChain*, UINT, UINT)> Detour_Present;
-HRESULT WINAPI Present(IDXGISwapChain* chain, UINT syncInterval, UINT flags)
+Fn_IDXGISwapChain_Present g_orig_IDXGISwapChain_Present = nullptr;
+HRESULT WINAPI New_IDXGISwapChain_Present(IDXGISwapChain* chain, UINT syncInterval, UINT flags)
 {
 	if (g_HookState == HookStateRunning && !g_D3DHook.m_IsResizing)
 	{
@@ -43,7 +45,7 @@ HRESULT WINAPI Present(IDXGISwapChain* chain, UINT syncInterval, UINT flags)
 
 					g_D3DHook.m_fullscreenState = fullscreenState;
 
-					Detour_Present(chain, syncInterval, flags);
+					g_orig_IDXGISwapChain_Present(chain, syncInterval, flags);
 
 					g_D3DHook.m_IsResizing = false;
 				}
@@ -54,12 +56,12 @@ HRESULT WINAPI Present(IDXGISwapChain* chain, UINT syncInterval, UINT flags)
 		}
 	}
 
-	return Detour_Present(chain, syncInterval, flags);
+	return g_orig_IDXGISwapChain_Present(chain, syncInterval, flags);
 }
 
 // IDXGISwapChain::ResizeBuffers
-DetourHook<HRESULT WINAPI(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT)> Detour_ResizeBuffers;
-HRESULT WINAPI ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+Fn_IDXGISwapChain_ResizeBuffers g_orig_IDXGISwapChain_ResizeBuffers = nullptr;
+HRESULT WINAPI New_IDXGISwapChain_ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
 	if (g_HookState == HookStateRunning)
 	{
@@ -67,14 +69,14 @@ HRESULT WINAPI ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width
 
 		g_D3DHook.ReleaseDevices(false);
 
-		Detour_ResizeBuffers(chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+		g_orig_IDXGISwapChain_ResizeBuffers(chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 
 		g_D3DHook.m_IsResizing = false;
 
 		return HRESULT();
 	}
 
-	return Detour_ResizeBuffers(chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+	return g_orig_IDXGISwapChain_ResizeBuffers(chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }
 
 //====================================================================================================================================================================
@@ -102,27 +104,38 @@ enum eSwapChainVtableIndices : int
 	SC_GETLASTPRESENTCOUNT,
 };
 
+
 bool DX11Hook::InitializeHooks()
 {
-	HMODULE hD3D11DLL = 0;
-	while (!hD3D11DLL)
-	{
-		hD3D11DLL = GetModuleHandle("d3d11.dll");
-		Sleep(100);
-	}
+	static bool has_set_IDXGISwapChain = false;
+	uint64_t** swapChainPtr = nullptr;
 	
-	if (auto swapchain = rage::GetGtaSwapChain())
-	{
-		PVOID* pVTable = *(PVOID**)swapchain;
+	while (!has_set_IDXGISwapChain) {
+		if (!swapChainPtr) {
+			swapChainPtr = rage::GetGtaSwapChain();
+		}
+		if (swapChainPtr && *swapChainPtr) {
+			swapChainVT = *swapChainPtr;
+			LOG_DEBUG("INIT: IDXGISwapChain 0x%016llX	Present:(0x%016llX)", swapChainVT, swapChainVT[SC_PRESENT]);
+			g_orig_IDXGISwapChain_Present = (Fn_IDXGISwapChain_Present)swapChainVT[SC_PRESENT];
+			g_orig_IDXGISwapChain_ResizeBuffers = (Fn_IDXGISwapChain_ResizeBuffers)swapChainVT[SC_RESIZEBUFFERS];
+				
+			// detected
+			// swapChainVT[SC_PRESENT] = (uint64_t)New_IDXGISwapChain_Present;
+			// swapChainVT[SC_RESIZEBUFFERS] = (uint64_t)New_IDXGISwapChain_ResizeBuffers;
 
-		Detour_Present.Hook(RCast(Present, pVTable[SC_PRESENT]), &Present, "IDXGISwapChainPresent");
-
-		Detour_ResizeBuffers.Hook(RCast(ResizeBuffers, pVTable[SC_RESIZEBUFFERS]), &ResizeBuffers, "IDXGISwapChainResizeBuffers");
-
-		return true;
+			// alternative: copy VT, replace VT
+			memcpy(g_copy_swapChainVT, swapChainVT, sizeof(g_copy_swapChainVT));
+			*swapChainPtr = g_copy_swapChainVT;
+			g_copy_swapChainVT[SC_PRESENT] = (uint64_t)New_IDXGISwapChain_Present;
+			g_copy_swapChainVT[SC_RESIZEBUFFERS] = (uint64_t)New_IDXGISwapChain_ResizeBuffers;
+			LOG_DEBUG("INIT: IDXGISwapChain set");
+			has_set_IDXGISwapChain = true;
+			break;
+		}
+		Sleep(1000);
 	}
-
-	return false;
+	return true;
 }
 
 //====================================================================================================================================================================
@@ -178,8 +191,8 @@ void DX11Hook::ReleaseDevices(bool unhook)
 
 	if (unhook)
 	{
-		Detour_ResizeBuffers.UnHook();
-		Detour_Present.UnHook();
+		swapChainVT[SC_RESIZEBUFFERS] = (uint64_t)g_orig_IDXGISwapChain_ResizeBuffers;
+		swapChainVT[SC_PRESENT] = (uint64_t)g_orig_IDXGISwapChain_Present;
 	}
 }
 

@@ -13,7 +13,9 @@ public:
 	}
 	const std::string GameDirectory() { return gameDirectory; }
 	const std::string VersionString() { return versionString; }
-	const int GameVersion();
+	const int GameVersion(bool mem=false);
+	const int GameVersionByMem();
+	const int GameVersionToHashVersion(int version);
 private:
 	int ReadVersionString();
 protected:

@@ -34,12 +34,14 @@ bool ScriptEngine::Initialize()
 		return false;
 	}
 
+	/*
 	// kill this data snoop ( must  be done after D3D )
 	if (Utility::GetProcessID("GTAVLauncher.exe"))
 	{
 		Utility::killProcessByName("GTAVLauncher.exe");
 		LOG_DEBUG("Killed %s", "GTAVLauncher.exe");
 	}
+	*/
 
 	// init Winproc hook
 	if (!InputHook::Initialize()) 
@@ -79,6 +81,7 @@ bool ScriptEngine::Initialize()
 	
 	if (Hooking::HookFunctions())
 	{
+		LOG_DEBUG("Hooking::HookFunctions ok");
 		ASILoader::Initialize();
 		
 		LOG_PRINT("Initialization finished");
