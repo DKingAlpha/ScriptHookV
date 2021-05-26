@@ -1,5 +1,6 @@
 #include "script.h"
 #include "keyboard.h"
+#include <mutex>
 
 bool is_menu_open = false;
 bool playerControl = false;
@@ -12,6 +13,7 @@ IDXGISwapChain*			 pSwapChain = nullptr;
 ID3D11DeviceContext*	 pDeviceContext = nullptr;
 ID3D11RenderTargetView*  pRenderTargetView = nullptr;
 
+static std::mutex nq_mutex;
 std::deque<std::function<void()>> g_nativeQueue;
 std::vector<std::tuple<std::function<bool()>, std::function<void()>>> g_callResults;
 
@@ -1077,7 +1079,7 @@ std::map<std::string, std::vector<std::tuple<const char*, const char*, uint32_t>
 		{ "Coquette Classic", "Invetero", 0x3c4e2113 },
 		{ "Deluxo", "Imponte", 0x586765fb },
 		{ "Fagaloa", "Vulcar", 0x6068ad86 },
-		{ "Fränken Stange", "Albany", 0xce6b35a4 },
+		{ "Fré‹˜ken Stange", "Albany", 0xce6b35a4 },
 		{ "GT500", "Grotti", 0x8408f33a },
 		{ "Infernus Classic", "Pegassi", 0xac33179c },
 		{ "JB 700", "Dewbauchee", 0x3eab5555 },
@@ -1611,11 +1613,13 @@ void update_features()
 {
 	update_status_text();
 
+	nq_mutex.lock();
 	while (!g_nativeQueue.empty())
 	{
 		g_nativeQueue.front()();
 		g_nativeQueue.pop_front();
 	}
+	nq_mutex.unlock();
 
 	if (ProcessPlayerButton > -1) ProcessPlayerButtons();
 

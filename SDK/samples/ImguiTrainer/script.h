@@ -41,8 +41,8 @@ void OnWndProcMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 void CallOnResult(const std::function<bool()>& result, const std::function<void()>& call);
 extern std::deque<std::function<void()>> g_nativeQueue;
-#define NQ_ g_nativeQueue.push_back([&] {
-#define _NQ });
+#define NQ_ nq_mutex.lock(); g_nativeQueue.push_back([&] {
+#define _NQ });  nq_mutex.unlock();
 
 namespace utils
 {
